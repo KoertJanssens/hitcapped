@@ -74,6 +74,10 @@ SLOT_OPTIONS: Dict[str, List[Item]] = {
     "feet": [
         Item("Ironstriders of Urgency", "feet", {"strength": 24, "critRating": 20, "hitRating": 16}),
     ],
+    "ranged": [
+        Item("Xavian Stiletto", "ranged", {"agility": 16, "attackPower": 30, "hitRating": 11}),
+        Item("Mama's Insurance", "ranged", {"agility": 20, "attackPower": 42, "critRating": 14}),
+    ],
 }
 
 RING_OPTIONS: List[Item] = [
@@ -150,8 +154,9 @@ def optimize(constraints: Dict[str, int] | None = None, top_n: int = 10) -> List
                                 for waist in SLOT_OPTIONS["waist"]:
                                     for legs in SLOT_OPTIONS["legs"]:
                                         for feet in SLOT_OPTIONS["feet"]:
-                                            for ring1, ring2 in ring_pairs:
-                                                total_sockets = (
+                                            for ranged in SLOT_OPTIONS["ranged"]:
+                                                for ring1, ring2 in ring_pairs:
+                                                    total_sockets = (
                                                     head.sockets
                                                     + neck.sockets
                                                     + shoulder.sockets
@@ -162,10 +167,11 @@ def optimize(constraints: Dict[str, int] | None = None, top_n: int = 10) -> List
                                                     + waist.sockets
                                                     + legs.sockets
                                                     + feet.sockets
+                                                    + ranged.sockets
                                                     + ring1.sockets
                                                     + ring2.sockets
                                                 )
-                                                total_meta = (
+                                                    total_meta = (
                                                     head.meta_sockets
                                                     + neck.meta_sockets
                                                     + shoulder.meta_sockets
@@ -176,13 +182,14 @@ def optimize(constraints: Dict[str, int] | None = None, top_n: int = 10) -> List
                                                     + waist.meta_sockets
                                                     + legs.meta_sockets
                                                     + feet.meta_sockets
+                                                    + ranged.meta_sockets
                                                     + ring1.meta_sockets
                                                     + ring2.meta_sockets
                                                 )
 
-                                                for food in FOOD_OPTIONS:
-                                                    for gems_label, gem_stats in gem_allocations(total_sockets):
-                                                        gear_stats = merge_stats(
+                                                    for food in FOOD_OPTIONS:
+                                                        for gems_label, gem_stats in gem_allocations(total_sockets):
+                                                            gear_stats = merge_stats(
                                                             head.stats,
                                                             neck.stats,
                                                             shoulder.stats,
@@ -193,17 +200,18 @@ def optimize(constraints: Dict[str, int] | None = None, top_n: int = 10) -> List
                                                             waist.stats,
                                                             legs.stats,
                                                             feet.stats,
+                                                            ranged.stats,
                                                             ring1.stats,
                                                             ring2.stats,
                                                             food.stats,
                                                             gem_stats,
                                                             {"metaSockets": total_meta},
                                                         )
-                                                        if not meets_constraints(gear_stats, constraints):
-                                                            continue
+                                                            if not meets_constraints(gear_stats, constraints):
+                                                                continue
 
-                                                        results.append(
-                                                            {
+                                                            results.append(
+                                                                {
                                                                 "head": head.name,
                                                                 "neck": neck.name,
                                                                 "shoulder": shoulder.name,
@@ -214,21 +222,22 @@ def optimize(constraints: Dict[str, int] | None = None, top_n: int = 10) -> List
                                                                 "waist": waist.name,
                                                                 "legs": legs.name,
                                                                 "feet": feet.name,
+                                                                "ranged": ranged.name,
                                                                 "finger1": ring1.name,
                                                                 "finger2": ring2.name,
                                                                 "food": food.name,
                                                                 "gems": gems_label,
                                                                 "stats": gear_stats,
                                                                 "score": round(score(gear_stats, STAT_WEIGHTS), 3),
-                                                            }
-                                                        )
+                                                                }
+                                                            )
 
     return sorted(results, key=lambda x: x["score"], reverse=True)[:top_n]
 
 
 def main() -> None:
     constraints = {"hitRating": 142}
-    best = optimize(constraints=constraints, top_n=10)
+    best = optimize(constraints=constraints, top_n=20)
 
     print("=== Top combinations ===")
     print(f"Constraints: {constraints}\n")
@@ -240,7 +249,7 @@ def main() -> None:
     for idx, combo in enumerate(best, start=1):
         print(f"{idx}. score={combo['score']}")
         for slot in [
-            "head", "neck", "shoulder", "back", "chest", "wrist", "hands", "waist", "legs", "feet", "finger1", "finger2", "food", "gems"
+            "head", "neck", "shoulder", "back", "chest", "wrist", "hands", "waist", "legs", "feet", "ranged", "finger1", "finger2", "food", "gems"
         ]:
             print(f"   {slot}: {combo[slot]}")
         print(f"   stats: {combo['stats']}")
