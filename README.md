@@ -7,6 +7,7 @@ This proof of concept brute-forces warrior gear combinations, prints stats for e
 - **Head**
   - Gladiator's Plate Helm
   - Helm of the Claw
+  - Furious Gizmatic Goggles
 - **Neck**
   - Choker of Vile Intent
 - **Shoulder**
@@ -25,6 +26,8 @@ This proof of concept brute-forces warrior gear combinations, prints stats for e
   - Skulker's Greaves
 - **Feet**
   - Ironstriders of Urgency
+- **Mainhand**
+  - Gladiator's Cleaver
 - **Finger (2 slots)**
   - Ring of Arathi Warlords
   - Mithril Band of the Unscarred
