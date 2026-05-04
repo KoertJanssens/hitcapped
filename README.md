@@ -14,6 +14,7 @@ This proof of concept brute-forces warrior gear combinations, prints stats for e
   - Warbringer Shoulderplates
 - **Back**
   - Cloak of the Inciter
+  - Cloak of the Pit Stalker
 - **Chest**
   - Gladiator's Plate Chestpiece
 - **Wrist**
@@ -26,6 +27,7 @@ This proof of concept brute-forces warrior gear combinations, prints stats for e
   - Skulker's Greaves
 - **Feet**
   - Ironstriders of Urgency
+  - Fel Leather Boots
 - **Mainhand**
   - Gladiator's Cleaver
 - **Finger (2 slots)**
@@ -50,7 +52,7 @@ python3 gear_optimizer.py
 
 ## Constraints
 
-Edit `constraints` in `main()` (treated as minimum values). The current default is 142 hit rating:
+Edit `constraints` in `main()` (treated as minimum values). The current default is 142 hit rating. Running `python3 gear_optimizer.py` also exports the top results to `top_results.md`:
 
 ```python
 constraints = {

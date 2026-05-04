@@ -57,6 +57,7 @@ SLOT_OPTIONS: Dict[str, List[Item]] = {
     ],
     "back": [
         Item("Cloak of the Inciter", "back", {"attackPower": 30, "hitRating": 16, "critRating": 18}),
+        Item("Cloak of the Pit Stalker", "back", {"attackPower": 56, "critRating": 24}),
     ],
     "chest": [
         Item("Gladiator's Plate Chestpiece", "chest", {"strength": 23, "hitRating": 12, "critRating": 30}, sockets=2),
@@ -75,6 +76,7 @@ SLOT_OPTIONS: Dict[str, List[Item]] = {
     ],
     "feet": [
         Item("Ironstriders of Urgency", "feet", {"strength": 33, "agility": 20}),
+        Item("Fel Leather Boots", "feet", {"attackPower": 36, "hitRating": 25, "critRating": 17}),
     ],
     "mainhand": [
         Item("Gladiator's Cleaver", "mainhand", {"attackPower": 28, "hitRating": 9, "critRating": 15}),
@@ -101,12 +103,14 @@ ITEM_ID_BY_NAME: Dict[str, int] = {
     "Choker of Vile Intent": 29381,
     "Warbringer Shoulderplates": 29023,
     "Cloak of the Inciter": 27892,
+    "Cloak of the Pit Stalker": 28777,
     "Gladiator's Plate Chestpiece": 24544,
     "Bladespire Warbands": 28795,
     "Gauntlets of Martial Perfection": 28824,
     "Deathforge Girdle": 27985,
     "Skulker's Greaves": 28741,
     "Ironstriders of Urgency": 28608,
+    "Fel Leather Boots": 25686,
     "Gladiator's Cleaver": 28308,
     "Furious Gizmatic Goggles": 32461,
     "Xavian Stiletto": 28659,
