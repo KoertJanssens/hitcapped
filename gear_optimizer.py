@@ -86,6 +86,28 @@ RING_OPTIONS: List[Item] = [
     Item("Violet Signet of the Master Assassin", "finger", {"agility": 22, "attackPower": 40, "hitRating": 19}),
 ]
 
+
+
+# Wowhead TBC item IDs are required for fetch_wowhead_item_stats(item_id).
+# Fill this map as you verify IDs from Wowhead URLs (item=<id>). 
+ITEM_ID_BY_NAME: Dict[str, int] = {
+    "Gladiator's Plate Helm": 24545,
+    "Helm of the Claw": 28182,
+    "Choker of Vile Intent": 29381,
+    "Warbringer Shoulderplates": 29023,
+    "Cloak of the Inciter": 27892,
+    "Gladiator's Plate Chestpiece": 24544,
+    "Bladespire Warbands": 28795,
+    "Gauntlets of Martial Perfection": 28824,
+    "Deathforge Girdle": 27985,
+    "Skulker's Greaves": 28741,
+    "Ironstriders of Urgency": 28608,
+    "Xavian Stiletto": 28659,
+    "Mama's Insurance": 30279,
+    "Ring of Arathi Warlords": 29379,
+    "Mithril Band of the Unscarred": 28730,
+    "Violet Signet of the Master Assassin": 29283,
+}
 HEAD_ENCHANT = {"name": "Glyph of Ferocity (+34 Attack Power, +16 Hit Rating)", "stats": {"attackPower": 34, "hitRating": 16}}
 
 FOOD_OPTIONS: List[FoodBuff] = [
@@ -93,6 +115,128 @@ FOOD_OPTIONS: List[FoodBuff] = [
     FoodBuff(name="Spicy Hot Talbuk (+20 Hit Rating)", stats={"hitRating": 20}),
 ]
 
+
+
+
+def build_item_stats_index() -> Dict[str, Dict[str, int]]:
+    """Build a lookup of item name -> base item stats from modeled gear options."""
+    index: Dict[str, Dict[str, int]] = {}
+    for items in SLOT_OPTIONS.values():
+        for item in items:
+            index[item.name] = dict(item.stats)
+    for item in RING_OPTIONS:
+        index[item.name] = dict(item.stats)
+    return index
+
+
+def get_item_stats(item_name: str) -> Dict[str, int]:
+    """Return hardcoded modeled stats for an item name."""
+    item_stats_index = build_item_stats_index()
+    if item_name not in item_stats_index:
+        raise KeyError(f"Unknown item '{item_name}'. Add it to SLOT_OPTIONS or RING_OPTIONS first.")
+    return item_stats_index[item_name]
+
+
+
+
+def all_modeled_item_names() -> List[str]:
+    names: List[str] = []
+    for items in SLOT_OPTIONS.values():
+        names.extend(item.name for item in items)
+    names.extend(item.name for item in RING_OPTIONS)
+    return names
+
+
+def verify_modeled_items_have_stats() -> List[str]:
+    """Verify every modeled item is retrievable through get_item_stats()."""
+    missing_or_empty: List[str] = []
+    for item_name in all_modeled_item_names():
+        stats = get_item_stats(item_name)
+        if not stats:
+            missing_or_empty.append(item_name)
+    return missing_or_empty
+
+
+
+def verify_modeled_items_have_wowhead_ids() -> List[str]:
+    """Return modeled item names that do not have a known Wowhead item ID yet."""
+    return [name for name in all_modeled_item_names() if name not in ITEM_ID_BY_NAME]
+
+def parse_wowhead_item_stats(html: str) -> Dict[str, int]:
+    """Parse a TBC Wowhead item page and extract selected combat stats."""
+    import re
+
+    patterns = {
+        "strength": r"\+(\d+) Strength",
+        "agility": r"\+(\d+) Agility",
+        "attackPower": r"Increases attack power by (\d+)\.?",
+        "hitRating": r"Improves hit rating by (\d+)\.?",
+        "critRating": r"Improves critical strike rating by (\d+)\.?",
+        "hasteRating": r"Improves haste rating by (\d+)\.?",
+        "expertiseRating": r"Increases your expertise rating by (\d+)\.?",
+        "armorPen": r"Your attacks ignore (\d+) of your opponent's armor",
+    }
+
+    stats: Dict[str, int] = {}
+    for stat_name, pattern in patterns.items():
+        match = re.search(pattern, html, flags=re.IGNORECASE)
+        if match:
+            stats[stat_name] = int(match.group(1))
+    return stats
+
+
+def fetch_wowhead_item_stats(item_id: int) -> Dict[str, int]:
+    """Fetch and parse item stats from Wowhead TBC for hardcoding into this PoC."""
+    from urllib.error import URLError
+    from urllib.request import Request, urlopen
+
+    url = f"https://www.wowhead.com/tbc/item={item_id}"
+    req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
+
+    try:
+        with urlopen(req, timeout=20) as response:
+            html = response.read().decode("utf-8", errors="replace")
+    except URLError as exc:
+        raise RuntimeError(f"Failed to fetch Wowhead item page: {url}") from exc
+
+    stats = parse_wowhead_item_stats(html)
+    if not stats:
+        raise ValueError(f"No supported stats parsed from Wowhead page: {url}")
+    return stats
+
+
+
+
+def verify_modeled_items_against_wowhead(delay_seconds: float = 1.0) -> Tuple[List[str], List[str]]:
+    """Compare modeled stats against parsed Wowhead stats with throttling between requests."""
+    import time
+
+    mismatches: List[str] = []
+    errors: List[str] = []
+
+    for item_name in all_modeled_item_names():
+        item_id = ITEM_ID_BY_NAME.get(item_name)
+        if item_id is None:
+            errors.append(f"{item_name}: missing Wowhead item ID")
+            continue
+
+        time.sleep(delay_seconds)
+
+        try:
+            wowhead_stats = fetch_wowhead_item_stats(item_id)
+        except Exception as exc:  # network/parse failures are surfaced in output
+            errors.append(f"{item_name} (id={item_id}): {exc}")
+            continue
+
+        modeled_stats = get_item_stats(item_name)
+        for stat_name, stat_value in wowhead_stats.items():
+            modeled_value = modeled_stats.get(stat_name, 0)
+            if modeled_value != stat_value:
+                mismatches.append(
+                    f"{item_name} (id={item_id}) {stat_name}: modeled={modeled_value}, wowhead={stat_value}"
+                )
+
+    return mismatches, errors
 
 def merge_stats(*stat_maps: Dict[str, int]) -> Dict[str, int]:
     merged: Dict[str, int] = {}
@@ -255,6 +399,37 @@ def print_all_gear_stats() -> None:
 def main() -> None:
     print_all_gear_stats()
     print()
+
+    missing_or_empty = verify_modeled_items_have_stats()
+    if missing_or_empty:
+        print("WARNING: Some modeled items are missing stats:")
+        for item_name in missing_or_empty:
+            print(f"- {item_name}")
+    else:
+        print(f"Verified {len(all_modeled_item_names())} modeled items via get_item_stats().")
+
+    missing_ids = verify_modeled_items_have_wowhead_ids()
+    if missing_ids:
+        print("WARNING: Missing Wowhead item IDs for:")
+        for item_name in missing_ids:
+            print(f"- {item_name}")
+    else:
+        print("All modeled items have Wowhead IDs.")
+
+    print("Verifying modeled stats against Wowhead (with request delay)...")
+    mismatches, wowhead_errors = verify_modeled_items_against_wowhead(delay_seconds=1.0)
+    if mismatches:
+        print("WARNING: Stat mismatches found:")
+        for row in mismatches:
+            print(f"- {row}")
+    else:
+        print("No stat mismatches detected for parsed Wowhead stats.")
+
+    if wowhead_errors:
+        print("WARNING: Wowhead verification errors:")
+        for row in wowhead_errors:
+            print(f"- {row}")
+
     constraints = {"hitRating": 142}
     best = optimize(constraints=constraints, top_n=30)
 
