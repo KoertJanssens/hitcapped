@@ -45,7 +45,7 @@ GEMS = {
 # NOTE: Stats were seeded from TBC database pages for PoC use.
 SLOT_OPTIONS: Dict[str, List[Item]] = {
     "head": [
-        Item("Gladiator's Plate Helm", "head", {"strength": 29, "hitRating": 13, "critRating": 24}, sockets=1, meta_sockets=1),
+        Item("Gladiator's Plate Helm", "head", {"strength": 30, "critRating": 28}, sockets=1, meta_sockets=1),
         Item("Helm of the Claw", "head", {"agility": 25, "hitRating": 14, "attackPower": 66}, sockets=1, meta_sockets=1),
     ],
     "neck": [
@@ -55,36 +55,36 @@ SLOT_OPTIONS: Dict[str, List[Item]] = {
         Item("Warbringer Shoulderplates", "shoulder", {"strength": 32, "agility": 22, "hitRating": 13}),
     ],
     "back": [
-        Item("Cloak of the Inciter", "back", {"agility": 21, "attackPower": 30, "hitRating": 16}),
+        Item("Cloak of the Inciter", "back", {"attackPower": 30, "hitRating": 16, "critRating": 18}),
     ],
     "chest": [
-        Item("Gladiator's Plate Chestpiece", "chest", {"strength": 12, "critRating": 24}, sockets=2),
+        Item("Gladiator's Plate Chestpiece", "chest", {"strength": 23, "hitRating": 12, "critRating": 30}, sockets=2),
     ],
     "wrist": [
-        Item("Bladespire Warbands", "wrist", {"strength": 3, "critRating": 16, "hitRating": 12}),
+        Item("Bladespire Warbands", "wrist", {"strength": 20, "critRating": 24}),
     ],
     "hands": [
-        Item("Gauntlets of Martial Perfection", "hands", {"strength": 44, "critRating": 30, "hitRating": 20}, sockets=1),
+        Item("Gauntlets of Martial Perfection", "hands", {"strength": 36, "critRating": 23}, sockets=1),
     ],
     "waist": [
-        Item("Deathforge Girdle", "waist", {"strength": 22, "agility": 3, "critRating": 16}, sockets=1),
+        Item("Deathforge Girdle", "waist", {"strength": 22, "critRating": 20}, sockets=1),
     ],
     "legs": [
-        Item("Skulker's Greaves", "legs", {"strength": 8, "agility": 8, "attackPower": 56}, sockets=3),
+        Item("Skulker's Greaves", "legs", {"agility": 32, "attackPower": 64, "hitRating": 28}, sockets=3),
     ],
     "feet": [
-        Item("Ironstriders of Urgency", "feet", {"strength": 30, "agility": 13, "critRating": 20, "hitRating": 16}),
+        Item("Ironstriders of Urgency", "feet", {"strength": 33, "agility": 20}),
     ],
     "ranged": [
-        Item("Xavian Stiletto", "ranged", {"agility": 16, "attackPower": 30, "hitRating": 11}),
-        Item("Mama's Insurance", "ranged", {"agility": 10, "attackPower": 32, "critRating": 14}),
+        Item("Xavian Stiletto", "ranged", {"hitRating": 12, "critRating": 20}),
+        Item("Mama's Insurance", "ranged", {"agility": 10, "attackPower": 32, "critRating": 6}),
     ],
 }
 
 RING_OPTIONS: List[Item] = [
-    Item("Ring of Arathi Warlords", "finger", {"strength": 20, "attackPower": 46, "hitRating": 18}),
-    Item("Mithril Band of the Unscarred", "finger", {"strength": 26, "attackPower": 44, "critRating": 20}),
-    Item("Violet Signet of the Master Assassin", "finger", {"agility": 22, "attackPower": 56, "hitRating": 19}),
+    Item("Ring of Arathi Warlords", "finger", {"attackPower": 46, "critRating": 23}),
+    Item("Mithril Band of the Unscarred", "finger", {"strength": 26, "critRating": 22}),
+    Item("Violet Signet of the Master Assassin", "finger", {"attackPower": 56, "hitRating": 25}),
 ]
 
 
@@ -164,21 +164,43 @@ def verify_modeled_items_have_wowhead_ids() -> List[str]:
     return [name for name in all_modeled_item_names() if name not in ITEM_ID_BY_NAME]
 
 def parse_wowhead_item_stats(html: str) -> Dict[str, int]:
-    """Parse a TBC Wowhead item page and extract selected combat stats."""
+    """Parse a TBC Wowhead item payload and extract selected combat stats."""
     import re
+
+    stats: Dict[str, int] = {}
+
+    json_equip_match = re.search(r"<jsonEquip><!\[CDATA\[(.*?)\]\]></jsonEquip>", html, flags=re.IGNORECASE | re.DOTALL)
+    if json_equip_match:
+        json_equip = json_equip_match.group(1)
+        json_patterns = {
+            "strength": r'"str":(\d+)',
+            "agility": r'"agi":(\d+)',
+            "attackPower": r'"mleatkpwr":(\d+)',
+            "hitRating": r'"mlehitrtng":(\d+)',
+            "critRating": r'"mlecritstrkrtng":(\d+)',
+            "hasteRating": r'"hastertng":(\d+)',
+            "expertiseRating": r'"exprtng":(\d+)',
+            "armorPen": r'"armorpenrtng":(\d+)',
+        }
+        for stat_name, pattern in json_patterns.items():
+            match = re.search(pattern, json_equip, flags=re.IGNORECASE)
+            if match:
+                stats[stat_name] = int(match.group(1))
+
+    if stats:
+        return stats
 
     patterns = {
         "strength": r"\+(\d+) Strength",
         "agility": r"\+(\d+) Agility",
         "attackPower": r"Increases attack power by (\d+)\.?",
-        "hitRating": r"Improves hit rating by (\d+)\.?",
-        "critRating": r"Improves critical strike rating by (\d+)\.?",
-        "hasteRating": r"Improves haste rating by (\d+)\.?",
+        "hitRating": r"Improves (?:your )?hit rating by (\d+)\.?",
+        "critRating": r"Improves (?:your )?critical strike rating by (\d+)\.?",
+        "hasteRating": r"Improves (?:your )?haste rating by (\d+)\.?",
         "expertiseRating": r"Increases your expertise rating by (\d+)\.?",
         "armorPen": r"Your attacks ignore (\d+) of your opponent's armor",
     }
 
-    stats: Dict[str, int] = {}
     for stat_name, pattern in patterns.items():
         match = re.search(pattern, html, flags=re.IGNORECASE)
         if match:
@@ -191,7 +213,7 @@ def fetch_wowhead_item_stats(item_id: int) -> Dict[str, int]:
     from urllib.error import URLError
     from urllib.request import Request, urlopen
 
-    url = f"https://www.wowhead.com/tbc/item={item_id}"
+    url = f"https://www.wowhead.com/tbc/item={item_id}&xml"
     req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
 
     try:
@@ -230,7 +252,9 @@ def verify_modeled_items_against_wowhead(delay_seconds: float = 1.0) -> Tuple[Li
             continue
 
         modeled_stats = get_item_stats(item_name)
-        for stat_name, stat_value in wowhead_stats.items():
+        relevant_stats = set(modeled_stats) | set(wowhead_stats)
+        for stat_name in relevant_stats:
+            stat_value = wowhead_stats.get(stat_name, 0)
             modeled_value = modeled_stats.get(stat_name, 0)
             if modeled_value != stat_value:
                 mismatches.append(
