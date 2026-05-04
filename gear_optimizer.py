@@ -476,13 +476,13 @@ def export_top_results_markdown(best: List[Dict], constraints: Dict[str, int], o
         "",
         "## Results (Top 30)",
         "",
-        "| Rank | Score | Head | Mainhand | Ranged | Finger1 | Finger2 | Food | Head Enchant | Gems | Hit | Attack Power |",
-        "|---:|---:|---|---|---|---|---|---|---|---|---:|---:|",
+        "| Rank | Score | Head | Neck | Shoulder | Back | Chest | Wrist | Hands | Waist | Legs | Feet | Mainhand | Ranged | Finger1 | Finger2 | Food | Head Enchant | Gems | Hit |",
+        "|---:|---:|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---:|",
     ]
 
     for idx, combo in enumerate(best, start=1):
         lines.append(
-            f"| {idx} | {combo['score']} | {combo['head']} | {combo['mainhand']} | {combo['ranged']} | {combo['finger1']} | {combo['finger2']} | {combo['food']} | {combo['head_enchant']} | {combo['gems']} | {combo['stats'].get('hitRating', 0)} | {combo['stats'].get('attackPower', 0)} |"
+            f"| {idx} | {combo['score']} | {combo['head']} | {combo['neck']} | {combo['shoulder']} | {combo['back']} | {combo['chest']} | {combo['wrist']} | {combo['hands']} | {combo['waist']} | {combo['legs']} | {combo['feet']} | {combo['mainhand']} | {combo['ranged']} | {combo['finger1']} | {combo['finger2']} | {combo['food']} | {combo['head_enchant']} | {combo['gems']} | {combo['stats'].get('hitRating', 0)} |"
         )
 
     with open(output_path, "w", encoding="utf-8") as f:
