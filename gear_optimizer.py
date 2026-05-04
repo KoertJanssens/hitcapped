@@ -47,6 +47,7 @@ SLOT_OPTIONS: Dict[str, List[Item]] = {
     "head": [
         Item("Gladiator's Plate Helm", "head", {"strength": 30, "critRating": 28}, sockets=1, meta_sockets=1),
         Item("Helm of the Claw", "head", {"agility": 25, "hitRating": 14, "attackPower": 66}, sockets=1, meta_sockets=1),
+        Item("Furious Gizmatic Goggles", "head", {"strength": 48, "hitRating": 13, "critRating": 38}, sockets=0, meta_sockets=1),
     ],
     "neck": [
         Item("Choker of Vile Intent", "neck", {"agility": 20, "hitRating": 18, "attackPower": 42}),
@@ -74,6 +75,9 @@ SLOT_OPTIONS: Dict[str, List[Item]] = {
     ],
     "feet": [
         Item("Ironstriders of Urgency", "feet", {"strength": 33, "agility": 20}),
+    ],
+    "mainhand": [
+        Item("Gladiator's Cleaver", "mainhand", {"attackPower": 28, "hitRating": 9, "critRating": 15}),
     ],
     "ranged": [
         Item("Xavian Stiletto", "ranged", {"hitRating": 12, "critRating": 20}),
@@ -103,6 +107,8 @@ ITEM_ID_BY_NAME: Dict[str, int] = {
     "Deathforge Girdle": 27985,
     "Skulker's Greaves": 28741,
     "Ironstriders of Urgency": 28608,
+    "Gladiator's Cleaver": 28308,
+    "Furious Gizmatic Goggles": 32461,
     "Xavian Stiletto": 28659,
     "Mama's Insurance": 30279,
     "Ring of Arathi Warlords": 29379,
@@ -325,85 +331,55 @@ def optimize(constraints: Dict[str, int] | None = None, top_n: int = 30) -> List
                                 for waist in SLOT_OPTIONS["waist"]:
                                     for legs in SLOT_OPTIONS["legs"]:
                                         for feet in SLOT_OPTIONS["feet"]:
-                                            for ranged in SLOT_OPTIONS["ranged"]:
-                                                for ring1, ring2 in ring_pairs:
-                                                    total_sockets = (
-                                                    head.sockets
-                                                    + neck.sockets
-                                                    + shoulder.sockets
-                                                    + back.sockets
-                                                    + chest.sockets
-                                                    + wrist.sockets
-                                                    + hands.sockets
-                                                    + waist.sockets
-                                                    + legs.sockets
-                                                    + feet.sockets
-                                                    + ranged.sockets
-                                                    + ring1.sockets
-                                                    + ring2.sockets
-                                                )
-                                                    total_meta = (
-                                                    head.meta_sockets
-                                                    + neck.meta_sockets
-                                                    + shoulder.meta_sockets
-                                                    + back.meta_sockets
-                                                    + chest.meta_sockets
-                                                    + wrist.meta_sockets
-                                                    + hands.meta_sockets
-                                                    + waist.meta_sockets
-                                                    + legs.meta_sockets
-                                                    + feet.meta_sockets
-                                                    + ranged.meta_sockets
-                                                    + ring1.meta_sockets
-                                                    + ring2.meta_sockets
-                                                )
-
-                                                    for food in FOOD_OPTIONS:
-                                                        for gems_label, gem_stats in gem_allocations(total_sockets):
-                                                            gear_stats = merge_stats(
-                                                            head.stats,
-                                                            neck.stats,
-                                                            shoulder.stats,
-                                                            back.stats,
-                                                            chest.stats,
-                                                            wrist.stats,
-                                                            hands.stats,
-                                                            waist.stats,
-                                                            legs.stats,
-                                                            feet.stats,
-                                                            ranged.stats,
-                                                            ring1.stats,
-                                                            ring2.stats,
-                                                            food.stats,
-                                                            HEAD_ENCHANT["stats"],
-                                                            gem_stats,
-                                                            {"metaSockets": total_meta},
+                                            for mainhand in SLOT_OPTIONS["mainhand"]:
+                                                for ranged in SLOT_OPTIONS["ranged"]:
+                                                    for ring1, ring2 in ring_pairs:
+                                                        total_sockets = (
+                                                            head.sockets + neck.sockets + shoulder.sockets + back.sockets
+                                                            + chest.sockets + wrist.sockets + hands.sockets + waist.sockets
+                                                            + legs.sockets + feet.sockets + mainhand.sockets + ranged.sockets
+                                                            + ring1.sockets + ring2.sockets
                                                         )
-                                                            if not meets_constraints(gear_stats, constraints):
-                                                                continue
+                                                        total_meta = (
+                                                            head.meta_sockets + neck.meta_sockets + shoulder.meta_sockets + back.meta_sockets
+                                                            + chest.meta_sockets + wrist.meta_sockets + hands.meta_sockets + waist.meta_sockets
+                                                            + legs.meta_sockets + feet.meta_sockets + mainhand.meta_sockets + ranged.meta_sockets
+                                                            + ring1.meta_sockets + ring2.meta_sockets
+                                                        )
 
-                                                            results.append(
-                                                                {
-                                                                "head": head.name,
-                                                                "neck": neck.name,
-                                                                "shoulder": shoulder.name,
-                                                                "back": back.name,
-                                                                "chest": chest.name,
-                                                                "wrist": wrist.name,
-                                                                "hands": hands.name,
-                                                                "waist": waist.name,
-                                                                "legs": legs.name,
-                                                                "feet": feet.name,
-                                                                "ranged": ranged.name,
-                                                                "finger1": ring1.name,
-                                                                "finger2": ring2.name,
-                                                                "food": food.name,
-                                                                "head_enchant": HEAD_ENCHANT["name"],
-                                                                "gems": gems_label,
-                                                                "stats": gear_stats,
-                                                                "score": round(score(gear_stats, STAT_WEIGHTS), 3),
-                                                                }
-                                                            )
+                                                        for food in FOOD_OPTIONS:
+                                                            for gems_label, gem_stats in gem_allocations(total_sockets):
+                                                                gear_stats = merge_stats(
+                                                                    head.stats, neck.stats, shoulder.stats, back.stats, chest.stats,
+                                                                    wrist.stats, hands.stats, waist.stats, legs.stats, feet.stats,
+                                                                    mainhand.stats, ranged.stats, ring1.stats, ring2.stats, food.stats,
+                                                                    HEAD_ENCHANT["stats"], gem_stats, {"metaSockets": total_meta},
+                                                                )
+                                                                if not meets_constraints(gear_stats, constraints):
+                                                                    continue
+                                                                results.append(
+                                                                    {
+                                                                        "head": head.name,
+                                                                        "neck": neck.name,
+                                                                        "shoulder": shoulder.name,
+                                                                        "back": back.name,
+                                                                        "chest": chest.name,
+                                                                        "wrist": wrist.name,
+                                                                        "hands": hands.name,
+                                                                        "waist": waist.name,
+                                                                        "legs": legs.name,
+                                                                        "feet": feet.name,
+                                                                        "mainhand": mainhand.name,
+                                                                        "ranged": ranged.name,
+                                                                        "finger1": ring1.name,
+                                                                        "finger2": ring2.name,
+                                                                        "food": food.name,
+                                                                        "head_enchant": HEAD_ENCHANT["name"],
+                                                                        "gems": gems_label,
+                                                                        "stats": gear_stats,
+                                                                        "score": round(score(gear_stats, STAT_WEIGHTS), 3),
+                                                                    }
+                                                                )
 
     return sorted(results, key=lambda x: x["score"], reverse=True)[:top_n]
 
@@ -474,11 +450,40 @@ def main(verify_stats: bool = False, verify_delay: float = 1.0) -> None:
     for idx, combo in enumerate(best, start=1):
         print(f"{idx}. score={combo['score']}")
         for slot in [
-            "head", "neck", "shoulder", "back", "chest", "wrist", "hands", "waist", "legs", "feet", "ranged", "finger1", "finger2", "food", "head_enchant", "gems"
+            "head", "neck", "shoulder", "back", "chest", "wrist", "hands", "waist", "legs", "feet", "mainhand", "ranged", "finger1", "finger2", "food", "head_enchant", "gems"
         ]:
             print(f"   {slot}: {combo[slot]}")
         print(f"   stats: {combo['stats']}")
         print()
+
+    export_top_results_markdown(best, constraints)
+
+
+def export_top_results_markdown(best: List[Dict], constraints: Dict[str, int], output_path: str = "top_results.md") -> None:
+    lines = [
+        "# Top Results (TBC Warrior Gear PoC)",
+        "",
+        "Generated from `gear_optimizer.py` with constraints and head enchant applied:",
+        "",
+        "```python",
+        f"constraints = {constraints}",
+        f"head_enchant = \"{HEAD_ENCHANT['name']}\"",
+        "```",
+        "",
+        "## Results (Top 30)",
+        "",
+        "| Rank | Score | Head | Mainhand | Ranged | Finger1 | Finger2 | Food | Head Enchant | Gems | Hit | Attack Power |",
+        "|---:|---:|---|---|---|---|---|---|---|---|---:|---:|",
+    ]
+
+    for idx, combo in enumerate(best, start=1):
+        lines.append(
+            f"| {idx} | {combo['score']} | {combo['head']} | {combo['mainhand']} | {combo['ranged']} | {combo['finger1']} | {combo['finger2']} | {combo['food']} | {combo['head_enchant']} | {combo['gems']} | {combo['stats'].get('hitRating', 0)} | {combo['stats'].get('attackPower', 0)} |"
+        )
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+    print(f"Exported markdown results to {output_path}")
 
 
 if __name__ == "__main__":
