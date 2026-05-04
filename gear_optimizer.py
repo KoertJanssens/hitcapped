@@ -86,6 +86,8 @@ RING_OPTIONS: List[Item] = [
     Item("Violet Signet of the Master Assassin", "finger", {"agility": 22, "attackPower": 40, "hitRating": 19}),
 ]
 
+HEAD_ENCHANT = {"name": "Glyph of Ferocity (+34 Attack Power, +16 Hit Rating)", "stats": {"attackPower": 34, "hitRating": 16}}
+
 FOOD_OPTIONS: List[FoodBuff] = [
     FoodBuff(name="Roasted Clefthoof (+20 Strength)", stats={"strength": 20}),
     FoodBuff(name="Spicy Hot Talbuk (+20 Hit Rating)", stats={"hitRating": 20}),
@@ -138,7 +140,7 @@ def gem_allocations(num_sockets: int) -> List[Tuple[str, Dict[str, int]]]:
     return allocations
 
 
-def optimize(constraints: Dict[str, int] | None = None, top_n: int = 10) -> List[Dict]:
+def optimize(constraints: Dict[str, int] | None = None, top_n: int = 30) -> List[Dict]:
     constraints = constraints or {}
     results = []
 
@@ -204,6 +206,7 @@ def optimize(constraints: Dict[str, int] | None = None, top_n: int = 10) -> List
                                                             ring1.stats,
                                                             ring2.stats,
                                                             food.stats,
+                                                            HEAD_ENCHANT["stats"],
                                                             gem_stats,
                                                             {"metaSockets": total_meta},
                                                         )
@@ -226,6 +229,7 @@ def optimize(constraints: Dict[str, int] | None = None, top_n: int = 10) -> List
                                                                 "finger1": ring1.name,
                                                                 "finger2": ring2.name,
                                                                 "food": food.name,
+                                                                "head_enchant": HEAD_ENCHANT["name"],
                                                                 "gems": gems_label,
                                                                 "stats": gear_stats,
                                                                 "score": round(score(gear_stats, STAT_WEIGHTS), 3),
@@ -235,11 +239,26 @@ def optimize(constraints: Dict[str, int] | None = None, top_n: int = 10) -> List
     return sorted(results, key=lambda x: x["score"], reverse=True)[:top_n]
 
 
-def main() -> None:
-    constraints = {"hitRating": 142}
-    best = optimize(constraints=constraints, top_n=20)
 
-    print("=== Top combinations ===")
+
+def print_all_gear_stats() -> None:
+    print("=== All gear options and stats ===")
+    for slot, items in SLOT_OPTIONS.items():
+        print(f"\n[{slot}]")
+        for item in items:
+            print(f"- {item.name}: {item.stats} (sockets={item.sockets}, meta_sockets={item.meta_sockets})")
+    print("\n[finger]")
+    for item in RING_OPTIONS:
+        print(f"- {item.name}: {item.stats} (sockets={item.sockets}, meta_sockets={item.meta_sockets})")
+    print(f"\n[head_enchant]\n- {HEAD_ENCHANT['name']}: {HEAD_ENCHANT['stats']}")
+
+def main() -> None:
+    print_all_gear_stats()
+    print()
+    constraints = {"hitRating": 142}
+    best = optimize(constraints=constraints, top_n=30)
+
+    print("=== Top 30 combinations ===")
     print(f"Constraints: {constraints}\n")
 
     if not best:
@@ -249,7 +268,7 @@ def main() -> None:
     for idx, combo in enumerate(best, start=1):
         print(f"{idx}. score={combo['score']}")
         for slot in [
-            "head", "neck", "shoulder", "back", "chest", "wrist", "hands", "waist", "legs", "feet", "ranged", "finger1", "finger2", "food", "gems"
+            "head", "neck", "shoulder", "back", "chest", "wrist", "hands", "waist", "legs", "feet", "ranged", "finger1", "finger2", "food", "head_enchant", "gems"
         ]:
             print(f"   {slot}: {combo[slot]}")
         print(f"   stats: {combo['stats']}")

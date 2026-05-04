@@ -1,6 +1,6 @@
 # TBC Warrior Gear Combo PoC
 
-This proof of concept brute-forces warrior gear combinations and ranks them by weighted score.
+This proof of concept brute-forces warrior gear combinations, prints stats for every modeled gear option, and ranks combinations by weighted score.
 
 ## Modeled options
 
@@ -29,6 +29,8 @@ This proof of concept brute-forces warrior gear combinations and ranks them by w
   - Ring of Arathi Warlords
   - Mithril Band of the Unscarred
   - Violet Signet of the Master Assassin
+- **Head Enchant**
+  - Glyph of Ferocity (+34 Attack Power, +16 Hit Rating)
 - **Food**
   - Roasted Clefthoof (+20 Strength)
   - Spicy Hot Talbuk (+20 Hit Rating)
@@ -59,3 +61,10 @@ constraints = {
 - Gem fills are generated as unique gem-count allocations (no duplicate permutation rows).
 - `metaSockets` is included in weighted scoring.
 - Item stats are seeded from TBC item database pages for PoC use.
+
+
+## Output
+
+- Running the script now prints full stats for all gear pieces first.
+- The optimizer calculates and prints the top 30 combinations by score.
+- A sample Top 30 markdown export is stored in `top_results.md`.
