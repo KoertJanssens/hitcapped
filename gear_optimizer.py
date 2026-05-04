@@ -6,6 +6,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from itertools import combinations
 from typing import Dict, List, Tuple
+import argparse
 
 STAT_WEIGHTS: Dict[str, float] = {
     "strength": 2.2,
@@ -44,46 +45,46 @@ GEMS = {
 # NOTE: Stats were seeded from TBC database pages for PoC use.
 SLOT_OPTIONS: Dict[str, List[Item]] = {
     "head": [
-        Item("Gladiator's Plate Helm", "head", {"strength": 30, "critRating": 28}, sockets=1, meta_sockets=1),
+        Item("Gladiator's Plate Helm", "head", {"strength": 29, "hitRating": 13, "critRating": 24}, sockets=1, meta_sockets=1),
         Item("Helm of the Claw", "head", {"agility": 25, "hitRating": 14, "attackPower": 66}, sockets=1, meta_sockets=1),
     ],
     "neck": [
         Item("Choker of Vile Intent", "neck", {"agility": 20, "hitRating": 18, "attackPower": 42}),
     ],
     "shoulder": [
-        Item("Warbringer Shoulderplates", "shoulder", {"strength": 24, "critRating": 17, "hitRating": 15}),
+        Item("Warbringer Shoulderplates", "shoulder", {"strength": 32, "agility": 22, "hitRating": 13}),
     ],
     "back": [
-        Item("Cloak of the Inciter", "back", {"agility": 21, "attackPower": 42, "hitRating": 16}),
+        Item("Cloak of the Inciter", "back", {"agility": 21, "attackPower": 30, "hitRating": 16}),
     ],
     "chest": [
-        Item("Gladiator's Plate Chestpiece", "chest", {"strength": 33, "critRating": 24}, sockets=2),
+        Item("Gladiator's Plate Chestpiece", "chest", {"strength": 12, "critRating": 24}, sockets=2),
     ],
     "wrist": [
-        Item("Bladespire Warbands", "wrist", {"strength": 17, "critRating": 16, "hitRating": 12}),
+        Item("Bladespire Warbands", "wrist", {"strength": 3, "critRating": 16, "hitRating": 12}),
     ],
     "hands": [
-        Item("Gauntlets of Martial Perfection", "hands", {"strength": 29, "critRating": 19, "hitRating": 20}, sockets=1),
+        Item("Gauntlets of Martial Perfection", "hands", {"strength": 44, "critRating": 30, "hitRating": 20}, sockets=1),
     ],
     "waist": [
-        Item("Deathforge Girdle", "waist", {"strength": 26, "critRating": 16}, sockets=1),
+        Item("Deathforge Girdle", "waist", {"strength": 22, "agility": 3, "critRating": 16}, sockets=1),
     ],
     "legs": [
-        Item("Skulker's Greaves", "legs", {"agility": 34, "attackPower": 84}, sockets=3),
+        Item("Skulker's Greaves", "legs", {"strength": 8, "agility": 8, "attackPower": 56}, sockets=3),
     ],
     "feet": [
-        Item("Ironstriders of Urgency", "feet", {"strength": 24, "critRating": 20, "hitRating": 16}),
+        Item("Ironstriders of Urgency", "feet", {"strength": 30, "agility": 13, "critRating": 20, "hitRating": 16}),
     ],
     "ranged": [
         Item("Xavian Stiletto", "ranged", {"agility": 16, "attackPower": 30, "hitRating": 11}),
-        Item("Mama's Insurance", "ranged", {"agility": 20, "attackPower": 42, "critRating": 14}),
+        Item("Mama's Insurance", "ranged", {"agility": 10, "attackPower": 32, "critRating": 14}),
     ],
 }
 
 RING_OPTIONS: List[Item] = [
-    Item("Ring of Arathi Warlords", "finger", {"strength": 20, "attackPower": 40, "hitRating": 18}),
-    Item("Mithril Band of the Unscarred", "finger", {"strength": 22, "attackPower": 44, "critRating": 20}),
-    Item("Violet Signet of the Master Assassin", "finger", {"agility": 22, "attackPower": 40, "hitRating": 19}),
+    Item("Ring of Arathi Warlords", "finger", {"strength": 20, "attackPower": 46, "hitRating": 18}),
+    Item("Mithril Band of the Unscarred", "finger", {"strength": 26, "attackPower": 44, "critRating": 20}),
+    Item("Violet Signet of the Master Assassin", "finger", {"agility": 22, "attackPower": 56, "hitRating": 19}),
 ]
 
 
@@ -396,7 +397,7 @@ def print_all_gear_stats() -> None:
         print(f"- {item.name}: {item.stats} (sockets={item.sockets}, meta_sockets={item.meta_sockets})")
     print(f"\n[head_enchant]\n- {HEAD_ENCHANT['name']}: {HEAD_ENCHANT['stats']}")
 
-def main() -> None:
+def main(verify_stats: bool = False, verify_delay: float = 1.0) -> None:
     print_all_gear_stats()
     print()
 
@@ -416,19 +417,25 @@ def main() -> None:
     else:
         print("All modeled items have Wowhead IDs.")
 
-    print("Verifying modeled stats against Wowhead (with request delay)...")
-    mismatches, wowhead_errors = verify_modeled_items_against_wowhead(delay_seconds=1.0)
-    if mismatches:
-        print("WARNING: Stat mismatches found:")
-        for row in mismatches:
-            print(f"- {row}")
-    else:
-        print("No stat mismatches detected for parsed Wowhead stats.")
+    if verify_stats:
+        print("Verifying modeled stats against Wowhead (with request delay)...")
+        mismatches, wowhead_errors = verify_modeled_items_against_wowhead(delay_seconds=verify_delay)
+        if mismatches:
+            print("WARNING: Stat mismatches found:")
+            for row in mismatches:
+                print(f"- {row}")
+        else:
+            print("No stat mismatches detected for parsed Wowhead stats.")
 
-    if wowhead_errors:
-        print("WARNING: Wowhead verification errors:")
-        for row in wowhead_errors:
-            print(f"- {row}")
+        if wowhead_errors:
+            print("WARNING: Wowhead verification errors:")
+            for row in wowhead_errors:
+                print(f"- {row}")
+
+        print("Verification mode enabled; skipping constraint optimization.")
+        return
+    else:
+        print("Skipping Wowhead stat verification (use --verify-stats to enable).")
 
     constraints = {"hitRating": 142}
     best = optimize(constraints=constraints, top_n=30)
@@ -451,4 +458,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Optimize warrior gear combinations.")
+    parser.add_argument("--verify-stats", action="store_true", default=False, help="Verify modeled stats against Wowhead before optimization.")
+    parser.add_argument("--verify-delay", type=float, default=1.0, help="Delay in seconds between Wowhead verification requests.")
+    args = parser.parse_args()
+    main(verify_stats=args.verify_stats, verify_delay=args.verify_delay)
