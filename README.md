@@ -25,6 +25,7 @@ This proof of concept brute-forces warrior gear combinations, prints stats for e
   - Deathforge Girdle
 - **Legs**
   - Skulker's Greaves
+  - Greaves of the Bloodwarder
 - **Feet**
   - Ironstriders of Urgency
   - Fel Leather Boots
