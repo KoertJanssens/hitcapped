@@ -73,6 +73,7 @@ SLOT_OPTIONS: Dict[str, List[Item]] = {
     ],
     "legs": [
         Item("Skulker's Greaves", "legs", {"agility": 32, "attackPower": 64, "hitRating": 28}, sockets=3),
+        Item("Greaves of the Bloodwarder", "legs", {"strength": 49, "critRating": 31}, sockets=3),
     ],
     "feet": [
         Item("Ironstriders of Urgency", "feet", {"strength": 33, "agility": 20}),
@@ -109,6 +110,7 @@ ITEM_ID_BY_NAME: Dict[str, int] = {
     "Gauntlets of Martial Perfection": 28824,
     "Deathforge Girdle": 27985,
     "Skulker's Greaves": 28741,
+    "Greaves of the Bloodwarder": 29950,
     "Ironstriders of Urgency": 28608,
     "Fel Leather Boots": 25686,
     "Gladiator's Cleaver": 28308,
