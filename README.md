@@ -23,6 +23,7 @@ This proof of concept brute-forces warrior gear combinations, prints stats for e
   - Gauntlets of Martial Perfection
 - **Waist**
   - Deathforge Girdle
+  - Red Belt of Battle
 - **Legs**
   - Skulker's Greaves
   - Greaves of the Bloodwarder
