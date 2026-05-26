@@ -70,6 +70,7 @@ SLOT_OPTIONS: Dict[str, List[Item]] = {
     ],
     "waist": [
         Item("Deathforge Girdle", "waist", {"strength": 22, "critRating": 20}, sockets=1),
+        Item("Red Belt of Battle", "waist", {"strength": 41, "critRating": 24, "hitRating": 14}, sockets=3),
     ],
     "legs": [
         Item("Skulker's Greaves", "legs", {"agility": 32, "attackPower": 64, "hitRating": 28}, sockets=3),
@@ -109,6 +110,7 @@ ITEM_ID_BY_NAME: Dict[str, int] = {
     "Bladespire Warbands": 28795,
     "Gauntlets of Martial Perfection": 28824,
     "Deathforge Girdle": 27985,
+    "Red Belt of Battle": 30032,
     "Skulker's Greaves": 28741,
     "Greaves of the Bloodwarder": 29950,
     "Ironstriders of Urgency": 28608,
