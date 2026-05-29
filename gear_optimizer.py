@@ -62,6 +62,7 @@ SLOT_OPTIONS: Dict[str, List[Item]] = {
     ],
     "chest": [
         Item("Gladiator's Plate Chestpiece", "chest", {"strength": 23, "hitRating": 12, "critRating": 30}, sockets=2),
+        Item("Destroyer Breastplate", "chest", {"strength": 50, "hitRating": 15, "critRating": 33}, sockets=3),
     ],
     "wrist": [
         Item("Bladespire Warbands", "wrist", {"strength": 20, "critRating": 24}),
@@ -109,6 +110,7 @@ ITEM_ID_BY_NAME: Dict[str, int] = {
     "Cloak of the Inciter": 27892,
     "Cloak of the Pit Stalker": 28777,
     "Gladiator's Plate Chestpiece": 24544,
+    "Destroyer Breastplate": 30118,
     "Bladespire Warbands": 28795,
     "Gauntlets of Martial Perfection": 28824,
     "Deathforge Girdle": 27985,
