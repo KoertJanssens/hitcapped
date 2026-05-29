@@ -54,6 +54,7 @@ SLOT_OPTIONS: Dict[str, List[Item]] = {
     ],
     "shoulder": [
         Item("Warbringer Shoulderplates", "shoulder", {"strength": 32, "agility": 22, "hitRating": 13}),
+        Item("Pauldrons of the Wardancer", "shoulder", {"strength": 38, "critRating": 29}, sockets=2),
     ],
     "back": [
         Item("Cloak of the Inciter", "back", {"attackPower": 30, "hitRating": 16, "critRating": 18}),
@@ -104,6 +105,7 @@ ITEM_ID_BY_NAME: Dict[str, int] = {
     "Helm of the Claw": 28182,
     "Choker of Vile Intent": 29381,
     "Warbringer Shoulderplates": 29023,
+    "Pauldrons of the Wardancer": 30053,
     "Cloak of the Inciter": 27892,
     "Cloak of the Pit Stalker": 28777,
     "Gladiator's Plate Chestpiece": 24544,
