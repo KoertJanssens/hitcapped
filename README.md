@@ -17,6 +17,7 @@ This proof of concept brute-forces warrior gear combinations, prints stats for e
   - Cloak of the Pit Stalker
 - **Chest**
   - Gladiator's Plate Chestpiece
+  - Destroyer Breastplate
 - **Wrist**
   - Bladespire Warbands
 - **Hands**
