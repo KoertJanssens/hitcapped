@@ -33,6 +33,7 @@ This proof of concept brute-forces warrior gear combinations, prints stats for e
   - Fel Leather Boots
 - **Mainhand**
   - Gladiator's Cleaver
+  - Merciless Gladiator's Cleaver
 - **Finger (2 slots)**
   - Ring of Arathi Warlords
   - Mithril Band of the Unscarred

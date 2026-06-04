@@ -84,6 +84,7 @@ SLOT_OPTIONS: Dict[str, List[Item]] = {
     ],
     "mainhand": [
         Item("Gladiator's Cleaver", "mainhand", {"attackPower": 28, "hitRating": 9, "critRating": 15}),
+        Item("Merciless Gladiator's Cleaver", "mainhand", {"attackPower": 30, "hitRating": 10, "critRating": 19}),
     ],
     "ranged": [
         Item("Xavian Stiletto", "ranged", {"hitRating": 12, "critRating": 20}),
@@ -120,6 +121,7 @@ ITEM_ID_BY_NAME: Dict[str, int] = {
     "Ironstriders of Urgency": 28608,
     "Fel Leather Boots": 25686,
     "Gladiator's Cleaver": 28308,
+    "Merciless Gladiator's Cleaver": 31965,
     "Furious Gizmatic Goggles": 32461,
     "Xavian Stiletto": 28659,
     "Mama's Insurance": 30279,
