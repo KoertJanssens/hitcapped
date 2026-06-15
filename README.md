@@ -56,11 +56,11 @@ python3 gear_optimizer.py
 
 ## Constraints
 
-Edit `constraints` in `main()` (treated as minimum values). The current default is 142 hit rating. Running `python3 gear_optimizer.py` also exports the top results to `top_results.md`:
+Edit `constraints` in `main()` (treated as minimum values). The current default is 95 hit rating. Running `python3 gear_optimizer.py` also exports the top results to `top_results.md`:
 
 ```python
 constraints = {
-    "hitRating": 142,
+    "hitRating": 95,
 }
 ```
 

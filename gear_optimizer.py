@@ -451,7 +451,7 @@ def main(verify_stats: bool = False, verify_delay: float = 1.0) -> None:
     else:
         print("Skipping Wowhead stat verification (use --verify-stats to enable).")
 
-    constraints = {"hitRating": 142}
+    constraints = {"hitRating": 95}
     best = optimize(constraints=constraints, top_n=30)
 
     print("=== Top 30 combinations ===")
